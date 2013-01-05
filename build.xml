@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="fmservice" default="dist" basedir=".">
+
+  <property file="build.properties"/>
+
+  <property name="app.name" value="fmservice"/>
+  <property name="src" value="src"/>
+  <property name="build" value="build"/>
+  <property name="debug" value="yes"/>
+  <property name="deprecations" value="yes"/>
+  <property name="dist" value="dist"/>
+  <property name="web" value="web"/>
+  <property name="lib" value="lib"/>
+
+  <path id="classpath.compile">
+    <fileset dir="${lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="clean" description="Delete old build and dist directories">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+
+  <target name="compile" depends="prepare" description="Compile Java sources">
+    <javac source="1.5" srcdir="${src}" destdir="${build}/WEB-INF/classes" listfiles="yes" debug="${debug}" 
+       deprecation="${deprecations}">
+      <classpath refid="classpath.compile"/>
+    </javac>
+    <!-- Copy application resources -->
+    <copy todir="${build}/WEB-INF/classes">
+      <fileset dir="${src}">
+        <exclude name="**/*.java"/>
+        <exclude name="**/*.swp"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="dist" depends="compile" description="Create binary distribution">
+    <jar jarfile="${dist}/${app.name}.war" basedir="${build}"/>
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/images"/>
+    <mkdir dir="${build}/WEB-INF"/>
+    <mkdir dir="${build}/WEB-INF/lib"/>
+    <mkdir dir="${build}/WEB-INF/classes"/>
+    <mkdir dir="${dist}"/>
+    <!-- Copy static content of this web application -->
+    <copy todir="${build}" overwrite="yes">
+      <fileset dir="${web}">
+        <include name="*.css"/>
+        <include name="*.html"/>
+        <include name="*.jsp"/>
+      </fileset>
+    </copy>
+    <copy todir="${build}/WEB-INF" overwrite="yes">
+      <fileset dir="${web}/WEB-INF">
+        <include name="*"/>
+      </fileset>
+    </copy>
+    <copy todir="${build}/images" overwrite="yes">
+      <fileset dir="${web}/images">
+        <include name="*"/>
+      </fileset>
+    </copy>
+    <!-- supporting jars -->
+    <copy todir="${build}/WEB-INF/lib" overwrite="yes">
+      <fileset dir="${lib}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+</project>
