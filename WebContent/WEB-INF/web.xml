@@ -6,10 +6,14 @@
 
 	<!-- The XML RCP Servlet -->
 	<servlet>
-		<servlet-name>XmlRpcServlet</servlet-name>
-		<servlet-class>org.apache.xmlrpc.webserver.XmlRpcServlet</servlet-class>
+		<servlet-name>FacilityManagerXmlRpcServlet</servlet-name>
+		<servlet-class>at.edu.uas.fm.service.FacilityManagerXmlRpcServlet</servlet-class>
 		<init-param>
 			<param-name>enabledForExtensions</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>enabledForExceptions</param-name>
 			<param-value>true</param-value>
 		</init-param>
 	</servlet>
@@ -22,7 +26,7 @@
 
 	<!-- mappings -->
 	<servlet-mapping>
-		<servlet-name>XmlRpcServlet</servlet-name>
+		<servlet-name>FacilityManagerXmlRpcServlet</servlet-name>
 		<url-pattern>/xmlrpc</url-pattern>
 	</servlet-mapping>
 	
