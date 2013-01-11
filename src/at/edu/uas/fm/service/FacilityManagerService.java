@@ -21,6 +21,10 @@ public class FacilityManagerService {
 		return DBHelper.getTasks();
 	}
 	
+	public Object[] getUserList(Object[] userId) {
+		return DBHelper.getUser();
+	}
+	
 //
 //	public Object[] getTypeTest(Object[] data) {
 //		Integer a = (Integer) data[0];

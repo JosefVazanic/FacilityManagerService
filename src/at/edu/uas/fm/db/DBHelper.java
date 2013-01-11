@@ -9,4 +9,13 @@ public class DBHelper {
 		return tasks;
 	}
 
+	public static String[] getUser() {
+		String[] array = new String[] { "Hans Putzer", "Dieter Rein",
+				"Sigmunde Hauswart", "Barbara Sauber", "Bruce Schmutzkiller" };
+		
+		return array;
+	}
+	
+	
+
 }
