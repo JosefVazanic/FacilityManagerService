@@ -17,7 +17,7 @@ public class FacilityManagerService {
 	// ??? means any of the working & tested types
 
 	public Object[] getTaskList(Object[] userId) {
-		return DBHelper.getTasks();
+		return DBHelper.getTaskList();
 	}
 
 	public Object[] getWorkerList() {
