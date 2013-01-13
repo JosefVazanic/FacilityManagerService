@@ -1,0 +1,113 @@
+body
+{
+	font-family:MetaBold,Trebuchet MS,sans-serif;
+	margin-right:0px;
+	color:#ffffff;	
+	padding:10px;
+	background:#556270;
+}
+h1
+{
+	color:#C7F464;
+	font-size:24px;
+}
+h2
+{
+	color:#C7F464;
+	font-size:20px;
+}
+div.header
+{
+	border-bottom:10px solid #C7F464;
+	height:30px;
+	margin:0 0 5px 120px;
+	padding-top:20px;
+	position:relative;
+}
+div.headercontents
+{
+	bottom:0;
+	padding-left:270px;
+	position:absolute;
+	text-align:right;
+}
+div.content
+{
+	margin-left: 0px;
+	width:100%;
+	text-align:justify;	
+}
+div.footer
+{
+	border-top:2px solid #C7F464;
+	height:20px;
+	margin:5px 0 0 120px;
+	position:relative;
+	font-size: small;
+	text-align:center;
+}
+#navigation
+{
+	width:95%;
+	padding:0px;
+	margin:auto;
+    text-align: right;
+}
+#navigation a 
+{
+	color:#ffffff;
+	text-decoration: none;
+	font-size:20px;
+	font-weight:bold;
+}
+#navigation a:hover 
+{
+	text-decoration:none;
+	color:#C7F464;
+}
+#navigation li 
+{
+    list-style: none;
+    display: inline;
+    margin: 3em; padding: 5;
+}
+
+.clear { /* generic container (i.e. div) for floating buttons */
+    overflow: hidden;
+    width: 100%;
+}
+
+a.button {
+    background: transparent url('../images/btnNormal.gif') no-repeat scroll top right;
+    color: #444;
+    display: block;
+    float: left;
+    font: normal 12px arial, sans-serif;
+    height: 24px;
+    margin-right: 6px;
+    padding-right: 18px; /* sliding doors padding */
+    text-decoration: none;
+}
+
+a.button span {
+    background: transparent url('../images/btnPressed.gif') no-repeat;
+    display: block;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;
+}
+
+a.button:active {
+    background-position: bottom right;
+    color: #000;
+    outline: none; /* hide dotted outline in Firefox */
+}
+
+a.button:active span {
+    background-position: bottom left;
+    padding: 6px 0 4px 18px; /* push text down 1px */
+}
+
+a:link { color: #ffffff; text-decoration : underline; }
+a:visited { color: #ffffff; text-decoration : underline; }
+a:hover {color: #C7F464; text-decoration: underline;}
+a:active { color: #ffffff; text-decoration : underline; }

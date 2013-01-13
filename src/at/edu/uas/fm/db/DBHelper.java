@@ -42,7 +42,6 @@ public class DBHelper {
 				&& !StringUtils.isNullOrEmpty(username)) {
 
 			try {
-				// get user from database using the user name
 				String query = "SELECT * FROM user WHERE UserID = ? AND UserName = ?";
 				statement = getConnection().prepareStatement(query);
 				statement.setLong(1, userId);
@@ -82,8 +81,6 @@ public class DBHelper {
 		Object[] result = new Object[0];
 
 		try {
-			// get user from database using the user name
-
 			String query = "SELECT * FROM user WHERE UserType = ?";
 			statement = getConnection().prepareStatement(query);
 			statement.setString(1, USER_TYPE_WORKER);
@@ -137,8 +134,6 @@ public class DBHelper {
 		Object[] result = new Object[0];
 
 		try {
-			// get user from database using the user name
-
 			String query = "SELECT * FROM task";
 			statement = getConnection().prepareStatement(query);
 			queryResult = statement.executeQuery();
@@ -184,8 +179,6 @@ public class DBHelper {
 		Object[] result = new Object[0];
 
 		try {
-			// get user from database using the user name
-
 			String query = "SELECT * FROM workobject wob LEFT JOIN address adr ON wob.Address_FK = adr.AddressID LEFT JOIN user usr ON wob.User_FK = usr.UserID";
 			statement = getConnection().prepareStatement(query);
 			queryResult = statement.executeQuery();
@@ -253,8 +246,6 @@ public class DBHelper {
 		Object[] result = new Object[0];
 
 		try {
-			// get user from database using the user name
-
 			String query = "SELECT * FROM taskassignment";
 			statement = getConnection().prepareStatement(query);
 			queryResult = statement.executeQuery();
@@ -313,6 +304,77 @@ public class DBHelper {
 		String[] status = new String[] { STATUS_TO_DO, STATUS_IN_PROGRESS,
 				STATUS_DONE, STATUS_NOT_POSSIBLE };
 		return status;
+	}
+
+	public static boolean deleteAssignment(Long assignmentId) {
+		
+		PreparedStatement statement = null;
+		boolean result = false;
+
+		try {
+
+			String query = "DELETE FROM taskassignment WHERE TaskAssignmentID = ?";
+			statement = getConnection().prepareStatement(query);
+			statement.setLong(1, assignmentId);
+			int rowCount = statement.executeUpdate();
+
+			if(rowCount > 0) {
+				result = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public static boolean insertAssignment(Long workObjectId, Long taskId,
+			String frequency, String frequencyInformation, Long workerId) {
+
+		PreparedStatement statement = null;
+		ResultSet queryResult = null;
+		boolean result = false;
+
+		try {
+
+			String query = "INSERT INTO taskassignment (Frequency, FrequencyInformation, Task_FK, WorkObject_FK, User_FK) VALUES (?, ?, ?, ?, ?)";
+			statement = getConnection().prepareStatement(query);
+
+			statement.setString(1, frequency);
+			statement.setString(2, frequencyInformation);
+			statement.setLong(3, taskId);
+			statement.setLong(4, workObjectId);
+			statement.setLong(5, workerId);
+
+			int rowCount = statement.executeUpdate();
+
+			if(rowCount > 0) {
+				result = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+				if (queryResult != null) {
+					queryResult.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 
 	private static Connection getConnection() {

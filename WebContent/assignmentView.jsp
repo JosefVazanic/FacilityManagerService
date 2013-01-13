@@ -5,6 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="./css/defaultStyle.css" />
 <title>Assign tasks!</title>
 </head>
 <body>
@@ -14,6 +15,13 @@
 	<p>Here you can see which tasks have to be done for which object
 		and who has to care about it. You can also define new assignments.</p>
 
+	<c:if test="${not empty message}">
+		<br />
+		<p style="color: blue; font: bold; font-size: large;">${message}</p>
+	</c:if>
+
+	<br />
+	<br />
 
 	<h2>Assignments</h2>
 
@@ -41,9 +49,9 @@
 					<td>${assignment[2]}</td>
 					<td>
 						<form method="post" action=".">
-							<input type="hidden" value="${assignment[0]}" /> <input
-								type="image" value="delete" alt="Delete" src="WEB-INF/images/delete.png"
-								height="16px" />
+							<input type="hidden" name="deleteAssignmentId"
+								value="${assignment[0]}" /> <input type="submit"
+								name="deleteAction" value="Delete" />
 						</form>
 					</td>
 				</tr>
@@ -104,7 +112,7 @@
 										</c:forEach>
 								</select></td>
 
-								<td><select name="selectedFrequencyId">
+								<td><select name="selectedFrequency">
 										<c:forEach items="${frequencies}" var="frequency">
 											<option value="${frequency}">${frequency}</option>
 										</c:forEach>
@@ -119,8 +127,8 @@
 
 								<td><input type="text" name="frequencyInformation" /></td>
 
-								<td><input type="image" value="ok" alt="OK"
-									src="WEB-INF/simages/ok.gif" height="16px" /></td>
+								<td><input type="submit" name="saveAction" value="Save" />
+								</td>
 
 							</tr>
 						</table>
