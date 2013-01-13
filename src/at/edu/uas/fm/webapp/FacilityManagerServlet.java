@@ -34,6 +34,10 @@ public class FacilityManagerServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		String[] tasks = DBHelper.getTasks();
 	    request.setAttribute("tasks", tasks);
+	    
+	    Object[] workes = DBHelper.getAllWorkers();
+	    request.setAttribute("workers", workes);
+	    
 	    RequestDispatcher dispatcher = request.getRequestDispatcher("taskAssignView.jsp");
 	    dispatcher.forward(request, response);
 	}

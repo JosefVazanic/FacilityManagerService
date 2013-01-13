@@ -5,11 +5,27 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Assign Tasks</title>
+<title>Test Site</title>
 </head>
 <body>
 
-	<h1>Assign Tasks</h1>
+	<h1>All Workers</h1>
+
+
+	<c:if test="${empty workers}">
+		<p>No workers!</p>
+	</c:if>
+	<c:if test="${not empty workers}">
+		<table>
+			<c:forEach items="${workers}" var="worker">
+				<tr>
+					<td>${worker}</td>
+				</tr>
+			</c:forEach>
+		</table>
+	</c:if>
+
+	<h1>All Tasks</h1>
 
 
 	<c:if test="${empty tasks}">
