@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.mysql.jdbc.StringUtils;
@@ -24,13 +25,6 @@ public class DBHelper {
 	private static final String FREQUENCY_DAILY = "Daily";
 	private static final String FREQUENCY_WEEKLY = "Weekly";
 	private static final String FREQUENCY_MONTHLY = "Monthly";
-
-	public static String[] getTaskList() {
-		String[] tasks = new String[] { "Fenster putzen", "Glühbirne wechseln",
-				"Stiegenhaus wischen" };
-
-		return tasks;
-	}
 
 	public static Boolean authenticate(Long userId, String username,
 			String password) {
@@ -173,6 +167,14 @@ public class DBHelper {
 	}
 
 	public static Object[] getAllWorkObjects() {
+		return getWorkObjects(null, false);
+	}
+
+	public static Object[] getWorkObjectsForUser(Long userId) {
+		return getWorkObjects(userId, true);
+	}
+
+	private static Object[] getWorkObjects(Long userId, boolean forUser) {
 
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
@@ -180,7 +182,13 @@ public class DBHelper {
 
 		try {
 			String query = "SELECT * FROM workobject wob LEFT JOIN address adr ON wob.Address_FK = adr.AddressID LEFT JOIN user usr ON wob.User_FK = usr.UserID";
+			if (forUser) {
+				query += " WHERE usr.UserId = ?";
+			}
 			statement = getConnection().prepareStatement(query);
+			if (forUser) {
+				statement.setLong(1, userId);
+			}
 			queryResult = statement.executeQuery();
 
 			List<Object> workObjectList = new ArrayList<Object>();
@@ -240,6 +248,14 @@ public class DBHelper {
 	}
 
 	public static Object[] getAllAssignments() {
+		return getAssignments(null, false);
+	}
+
+	public static Object[] getAssignmentsForUser(Long userId) {
+		return getAssignments(userId, true);
+	}
+
+	private static Object[] getAssignments(Long userId, boolean forUser) {
 
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
@@ -247,7 +263,13 @@ public class DBHelper {
 
 		try {
 			String query = "SELECT * FROM taskassignment";
+			if (forUser) {
+				query += " WHERE User_FK = ?";
+			}
 			statement = getConnection().prepareStatement(query);
+			if (forUser) {
+				statement.setLong(1, userId);
+			}
 			queryResult = statement.executeQuery();
 
 			List<Object> taskAssignmentList = new ArrayList<Object>();
@@ -307,7 +329,7 @@ public class DBHelper {
 	}
 
 	public static boolean deleteAssignment(Long assignmentId) {
-		
+
 		PreparedStatement statement = null;
 		boolean result = false;
 
@@ -318,7 +340,7 @@ public class DBHelper {
 			statement.setLong(1, assignmentId);
 			int rowCount = statement.executeUpdate();
 
-			if(rowCount > 0) {
+			if (rowCount > 0) {
 				result = true;
 			}
 
@@ -356,7 +378,91 @@ public class DBHelper {
 
 			int rowCount = statement.executeUpdate();
 
-			if(rowCount > 0) {
+			if (rowCount > 0) {
+				result = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+				if (queryResult != null) {
+					queryResult.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public static boolean insertWorkItem(Long taskAssignmentId, String status,
+			Date date) {
+
+		PreparedStatement statement = null;
+		ResultSet queryResult = null;
+		boolean result = false;
+
+		try {
+
+			String query = "INSERT INTO workitem (TaskAssignment_FK, Status, Date) VALUES (?, ?, ?)";
+			statement = getConnection().prepareStatement(query);
+
+			statement.setLong(1, taskAssignmentId);
+			statement.setString(2, status);
+			statement.setDate(3, new java.sql.Date(date.getTime()));
+
+			int rowCount = statement.executeUpdate();
+
+			if (rowCount > 0) {
+				result = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+				if (queryResult != null) {
+					queryResult.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public static boolean insertAdditionalWorkItem(String taskName,
+			String taskDescription, String frequency,
+			String frequencyInformation, String status, Long userId,
+			Long workObjectId) {
+
+		PreparedStatement statement = null;
+		ResultSet queryResult = null;
+		boolean result = false;
+
+		try {
+
+			String query = "INSERT INTO additionalworkitem (TaskName, TaskDescription, Frequency, FrequencyInformation, Status, User_FK, WorkObject_FK) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			statement = getConnection().prepareStatement(query);
+
+			statement.setString(1, taskName);
+			statement.setString(2, taskDescription);
+			statement.setString(3, frequency);
+			statement.setString(4, frequencyInformation);
+			statement.setString(5, status);
+			statement.setLong(6, userId);
+			statement.setLong(7, workObjectId);
+
+			int rowCount = statement.executeUpdate();
+
+			if (rowCount > 0) {
 				result = true;
 			}
 

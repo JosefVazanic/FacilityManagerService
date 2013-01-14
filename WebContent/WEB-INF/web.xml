@@ -14,7 +14,7 @@
 		</init-param>
 		<init-param>
 			<param-name>enabledForExceptions</param-name>
-			<param-value>false</param-value>
+			<param-value>true</param-value>
 		</init-param>
 	</servlet>
 	
@@ -23,13 +23,7 @@
         <servlet-name>FacilityManagerServlet</servlet-name>
         <servlet-class>at.edu.uas.fm.webapp.FacilityManagerServlet</servlet-class>
     </servlet>
-	
-	<!-- The web app test servlet -->
-    <servlet>
-        <servlet-name>FacilityManagerTestServlet</servlet-name>
-        <servlet-class>at.edu.uas.fm.webapp.FacilityManagerTestServlet</servlet-class>
-    </servlet>
-
+    
 	<!-- mappings -->
 	<servlet-mapping>
 		<servlet-name>FacilityManagerXmlRpcServlet</servlet-name>
@@ -39,11 +33,6 @@
     <servlet-mapping>
         <servlet-name>FacilityManagerServlet</servlet-name>
         <url-pattern>/</url-pattern>
-    </servlet-mapping>
-	
-    <servlet-mapping>
-        <servlet-name>FacilityManagerTestServlet</servlet-name>
-        <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
     <!-- config -->

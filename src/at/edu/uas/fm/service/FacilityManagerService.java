@@ -1,5 +1,7 @@
 package at.edu.uas.fm.service;
 
+import java.util.Date;
+
 import at.edu.uas.fm.db.DBHelper;
 
 public class FacilityManagerService {
@@ -8,44 +10,38 @@ public class FacilityManagerService {
 		// nothing to do
 	}
 
-	// Important type restrictions!!!
+	public Object[] getWorkObjectList(Object[] inputParams) {
+		Long userId = (Long) inputParams[0];
+		return DBHelper.getWorkObjectsForUser(userId);
+	}
 
-	// Not working: Long; Map
-	// Working & tested: Integer, String, Boolean, Date, ???[], List<???>
-	// Changing types: List<???> -> Object[???]; ???[] -> Object[???]
+	public Object[] getTaskList() {
+		return DBHelper.getTasks();
+	}
 
-	// ??? means any of the working & tested types
-
-	public Object[] getTaskList(Object[] userId) {
-		return DBHelper.getTaskList();
+	public Object[] getTaskAssignmentList(Object[] inputParams) {
+		Long userId = (Long) inputParams[0];
+		return DBHelper.getAssignmentsForUser(userId);
 	}
 
 	public Object[] getWorkerList() {
 		return DBHelper.getAllWorkers();
 	}
 
-	public Boolean authenticate(Object[] authenticationData) {
-		return DBHelper.authenticate((Long) authenticationData[0],
-				(String) authenticationData[1], (String) authenticationData[2]);
+	public Boolean authenticate(Object[] inputParams) {
+		return DBHelper.authenticate((Long) inputParams[0],
+				(String) inputParams[1], (String) inputParams[2]);
 	}
 
-	//
-	// public Object[] getTypeTest(Object[] data) {
-	// Integer a = (Integer) data[0];
-	// String b = (String) data[1];
-	// Boolean c = (Boolean) data[2];
-	// Date d = (Date) data[3];
-	//
-	// Object[] result = new Object[] {a, b, c, d};
-	// return result;
-	// }
-	//
-	// public Object[] getTypeTest2(Object[] data) {
-	// Object[] a = (Object[]) data[0];
-	// Object[] b = (Object[]) data[1];
-	//
-	// Object[] result = new Object[] {a, b};
-	// return result;
-	// }
+	public Boolean insertWorkItem(Object[] inputParams) {
+		return DBHelper.insertWorkItem((Long) inputParams[0],
+				(String) inputParams[1], (Date) inputParams[2]);
+	}
 
+	public Boolean insertAdditionalWorkItem(Object[] inputParams) {
+		return DBHelper.insertAdditionalWorkItem((String) inputParams[0],
+				(String) inputParams[1], (String) inputParams[2],
+				(String) inputParams[3], (String) inputParams[4],
+				(Long) inputParams[5], (Long) inputParams[6]);
+	}
 }

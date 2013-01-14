@@ -116,24 +116,6 @@ public class FacilityManagerServlet extends HttpServlet {
 		Object[] assignmentsView = prepareAssignmentsForView(assignments,
 				workObjects, tasks, workers);
 
-		// for TESTING only
-		//
-		// Object[] workObjects = new Object[] { new Object[] { 1234L, 4444,
-		// "Objektname" } };
-		// Object[] tasks = new Object[] {
-		// new Object[] { 1234L, "Putzen", "bla" },
-		// new Object[] { 1235L, "Waschen", "bla" } };
-		// Object[] workers = new Object[] {
-		// new Object[] { 1234L, "", "Peter", "Stehter" },
-		// new Object[] { 1235L, "", "Ge", "org" } };
-		// String[] frequencies = DBHelper.getFrequencies();
-		//
-		// Object[] assignmentsView = new Object[] {
-		// new Object[] { 1234L, "Once", "Info1", "Putzen", "Objektname",
-		// "Peter Stehter" },
-		// new Object[] { 1235L, "Once", "Info1", "Putzen", "Objektname",
-		// "Peter Stehter" } };
-
 		request.setAttribute("assignments", assignmentsView);
 		request.setAttribute("workObjects", workObjects);
 		request.setAttribute("tasks", tasks);
