@@ -167,14 +167,6 @@ public class DBHelper {
 	}
 
 	public static Object[] getAllWorkObjects() {
-		return getWorkObjects(null, false);
-	}
-
-	public static Object[] getWorkObjectsForUser(Long userId) {
-		return getWorkObjects(userId, true);
-	}
-
-	private static Object[] getWorkObjects(Long userId, boolean forUser) {
 
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
@@ -182,13 +174,7 @@ public class DBHelper {
 
 		try {
 			String query = "SELECT * FROM workobject wob LEFT JOIN address adr ON wob.Address_FK = adr.AddressID LEFT JOIN user usr ON wob.User_FK = usr.UserID";
-			if (forUser) {
-				query += " WHERE usr.UserId = ?";
-			}
 			statement = getConnection().prepareStatement(query);
-			if (forUser) {
-				statement.setLong(1, userId);
-			}
 			queryResult = statement.executeQuery();
 
 			List<Object> workObjectList = new ArrayList<Object>();

@@ -10,9 +10,8 @@ public class FacilityManagerService {
 		// nothing to do
 	}
 
-	public Object[] getWorkObjectList(Object[] inputParams) {
-		Long userId = (Long) inputParams[0];
-		return DBHelper.getWorkObjectsForUser(userId);
+	public Object[] getWorkObjectList() {
+		return DBHelper.getAllWorkObjects();
 	}
 
 	public Object[] getTaskList() {
