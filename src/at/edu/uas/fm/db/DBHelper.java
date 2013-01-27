@@ -449,7 +449,7 @@ public class DBHelper {
 			// we've got results, build helper map
 			while (queryResult.next()) {
 
-				Long assignmentId = queryResult.getLong("TaskAssignmentID");
+				Long assignmentId = queryResult.getLong("TaskAssignment_FK");
 
 				// create work item data
 				Object[] workItem = new Object[4];
@@ -563,8 +563,9 @@ public class DBHelper {
 
 		try {
 
+			boolean isUpdate = workItemId != null;
 			String query = "";
-			if (workItemId == null) {
+			if (!isUpdate) {
 				query = "INSERT INTO workitem (TaskAssignment_FK, Status, Date) VALUES (?, ?, ?)";
 			} else {
 				query = "UPDATE workitem SET TaskAssignment_FK = ?, Status = ?, Date = ? WHERE WorkItemID = ?";
@@ -575,21 +576,18 @@ public class DBHelper {
 			statement.setLong(1, taskAssignmentId);
 			statement.setString(2, status);
 			statement.setDate(3, new java.sql.Date(date.getTime()));
-			if (workItemId != null) {
+			if (isUpdate) {
 				statement.setLong(4, workItemId);
 			}
 
 			int rowCount = statement.executeUpdate();
 
-			ResultSet resultSet = statement.getGeneratedKeys();
+			if (rowCount > 0) {
+				Long returnWorkItemId = workItemId;
 
-			if (rowCount > 0 && resultSet != null && resultSet.first()) {
-
-				Long returnWorkItemId = null;
-				if (workItemId == null) {
-					returnWorkItemId = resultSet.getLong(0);
-				} else {
-					returnWorkItemId = workItemId;
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (!isUpdate && resultSet != null && resultSet.first()) {
+					returnWorkItemId = resultSet.getLong(1);
 				}
 
 				result = new Object[] { returnWorkItemId, taskAssignmentId,
