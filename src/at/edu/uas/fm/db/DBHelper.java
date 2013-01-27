@@ -4,9 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mysql.jdbc.StringUtils;
 
@@ -407,26 +411,189 @@ public class DBHelper {
 		return result;
 	}
 
-	public static boolean insertWorkItem(Long taskAssignmentId, String status,
-			Date date) {
+	public static Object[] getWorkItemListForAssignments(
+			List<Long> assignmentIds) {
 
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
-		boolean result = false;
+		Object[] result = new Object[0];
+
+		try {
+			String assignmentIdsString = "";
+			int size = assignmentIds.size();
+			for (int i = 0; i < size; i++) {
+				if (i == size - 1) {
+					assignmentIdsString += "?";
+				} else {
+					assignmentIdsString += "?, ";
+				}
+			}
+
+			String query = "SELECT wi.*, tass.Frequency FROM workitem wi INNER JOIN taskassignment tass ON wi.TaskAssignment_FK = tass.TaskAssignmentID "
+					+ "WHERE wi.TaskAssignment_FK IN ("
+					+ assignmentIdsString
+					+ ") ORDER BY wi.TaskAssignment_FK";
+			statement = getConnection().prepareStatement(query);
+
+			int i = 1;
+			for (Long assignmentId : assignmentIds) {
+				statement.setLong(i, assignmentId);
+				i++;
+			}
+
+			queryResult = statement.executeQuery();
+
+			Map<Long, List<Object>> assignmentWorkItemMap = new HashMap<Long, List<Object>>();
+			Map<Long, String> assignmentFrequencyMap = new HashMap<Long, String>();
+
+			// we've got results, build helper map
+			while (queryResult.next()) {
+
+				Long assignmentId = queryResult.getLong("TaskAssignmentID");
+
+				// create work item data
+				Object[] workItem = new Object[4];
+				workItem[0] = queryResult.getLong("WorkItemID");
+				workItem[1] = assignmentId;
+				workItem[2] = queryResult.getString("Status");
+				workItem[3] = queryResult.getDate("Date");
+
+				// fill assignment <-> work item map
+				List<Object> workItemList = assignmentWorkItemMap
+						.get(assignmentId);
+				if (workItemList == null) {
+					workItemList = new ArrayList<Object>();
+					assignmentWorkItemMap.put(assignmentId, workItemList);
+				}
+				workItemList.add(workItem);
+
+				// fill assignment <-> frequency map
+				String frequency = queryResult.getString("Frequency");
+				String frequencyFromMap = assignmentFrequencyMap
+						.get(assignmentId);
+				if (frequencyFromMap == null) {
+					assignmentFrequencyMap.put(assignmentId, frequency);
+				} else if (!frequencyFromMap.equals(frequency)) {
+					throw new Exception("Error occured");
+				}
+			}
+
+			// filter by frequency and build result work item list
+			List<Object> workItemResultList = new ArrayList<Object>();
+			Calendar today = Calendar.getInstance();
+
+			for (Map.Entry<Long, List<Object>> assignmentWorkItemMapEntry : assignmentWorkItemMap
+					.entrySet()) {
+				List<Object> workItemList = assignmentWorkItemMapEntry
+						.getValue();
+				String frequency = assignmentFrequencyMap
+						.get(assignmentWorkItemMapEntry.getKey());
+
+				for (Object workItem : workItemList) {
+					Date workItemDate = (Date) ((Object[]) workItem)[3];
+					Calendar workItemCalendar = Calendar.getInstance();
+					workItemCalendar.setTime(workItemDate);
+
+					if (FREQUENCY_DAILY.equals(frequency)) {
+
+						boolean sameDay = today.get(Calendar.YEAR) == workItemCalendar
+								.get(Calendar.YEAR)
+								&& today.get(Calendar.DAY_OF_YEAR) == workItemCalendar
+										.get(Calendar.DAY_OF_YEAR);
+						if (!sameDay) {
+							continue;
+						}
+
+					} else if (FREQUENCY_WEEKLY.equals(frequency)) {
+
+						boolean sameWeek = today.get(Calendar.YEAR) == workItemCalendar
+								.get(Calendar.YEAR)
+								&& today.get(Calendar.WEEK_OF_YEAR) == workItemCalendar
+										.get(Calendar.WEEK_OF_YEAR);
+						if (!sameWeek) {
+							continue;
+						}
+
+					} else if (FREQUENCY_MONTHLY.equals(frequency)) {
+
+						boolean sameMonth = today.get(Calendar.YEAR) == workItemCalendar
+								.get(Calendar.YEAR)
+								&& today.get(Calendar.MONTH) == workItemCalendar
+										.get(Calendar.MONTH);
+						if (!sameMonth) {
+							continue;
+						}
+
+					} else {
+						continue;
+					}
+
+					workItemResultList.add(workItem);
+				}
+
+			}
+
+			if (workItemResultList.size() > 0) {
+				result = workItemResultList.toArray();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+				if (queryResult != null) {
+					queryResult.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public static Object[] insertOrUpdateWorkItem(Long workItemId,
+			Long taskAssignmentId, String status, Date date) {
+
+		PreparedStatement statement = null;
+		ResultSet queryResult = null;
+		Object[] result = new Object[0];
 
 		try {
 
-			String query = "INSERT INTO workitem (TaskAssignment_FK, Status, Date) VALUES (?, ?, ?)";
-			statement = getConnection().prepareStatement(query);
+			String query = "";
+			if (workItemId == null) {
+				query = "INSERT INTO workitem (TaskAssignment_FK, Status, Date) VALUES (?, ?, ?)";
+			} else {
+				query = "UPDATE workitem SET TaskAssignment_FK = ?, Status = ?, Date = ? WHERE WorkItemID = ?";
+			}
+			statement = getConnection().prepareStatement(query,
+					Statement.RETURN_GENERATED_KEYS);
 
 			statement.setLong(1, taskAssignmentId);
 			statement.setString(2, status);
 			statement.setDate(3, new java.sql.Date(date.getTime()));
+			if (workItemId != null) {
+				statement.setLong(4, workItemId);
+			}
 
 			int rowCount = statement.executeUpdate();
 
-			if (rowCount > 0) {
-				result = true;
+			ResultSet resultSet = statement.getGeneratedKeys();
+
+			if (rowCount > 0 && resultSet != null && resultSet.first()) {
+
+				Long returnWorkItemId = null;
+				if (workItemId == null) {
+					returnWorkItemId = resultSet.getLong(0);
+				} else {
+					returnWorkItemId = workItemId;
+				}
+
+				result = new Object[] { returnWorkItemId, taskAssignmentId,
+						status, date };
 			}
 
 		} catch (Exception e) {
