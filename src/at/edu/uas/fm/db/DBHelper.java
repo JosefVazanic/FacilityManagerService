@@ -26,20 +26,18 @@ public class DBHelper {
 	private static final String FREQUENCY_WEEKLY = "Weekly";
 	private static final String FREQUENCY_MONTHLY = "Monthly";
 
-	public static Boolean authenticate(Long userId, String username,
-			String password) {
+	public static Boolean authenticate(String username, String password) {
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
 		Boolean result = false;
 
-		if (userId == null || !StringUtils.isNullOrEmpty(username)
-				&& !StringUtils.isNullOrEmpty(username)) {
+		if (!StringUtils.isNullOrEmpty(username)
+				&& !StringUtils.isNullOrEmpty(password)) {
 
 			try {
-				String query = "SELECT * FROM user WHERE UserID = ? AND UserName = ?";
+				String query = "SELECT * FROM user WHERE UserName = ?";
 				statement = getConnection().prepareStatement(query);
-				statement.setLong(1, userId);
-				statement.setString(2, username);
+				statement.setString(1, username);
 
 				queryResult = statement.executeQuery();
 				// we've got results - and we only check the first one
@@ -166,15 +164,39 @@ public class DBHelper {
 		return result;
 	}
 
+	public static Object[] getWorkObjectsForUser(Long userId) {
+		if (userId == null) {
+			return new Object[0];
+		}
+		return getWorkObjects(userId);
+	}
+
 	public static Object[] getAllWorkObjects() {
+		return getWorkObjects(null);
+	}
+
+	private static Object[] getWorkObjects(Long userId) {
 
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
 		Object[] result = new Object[0];
 
 		try {
-			String query = "SELECT * FROM workobject wob LEFT JOIN address adr ON wob.Address_FK = adr.AddressID LEFT JOIN user usr ON wob.User_FK = usr.UserID";
+			String query = "";
+			if (userId != null) {
+				query = "SELECT DISTINCT wob.*, adr.*, usr.* FROM workobject wob INNER JOIN taskassignment tass ON tass.WorkObject_FK = wob.WorkObjectID "
+						+ "LEFT JOIN address adr ON wob.Address_FK = adr.AddressID LEFT JOIN user usr ON wob.User_FK = usr.UserID WHERE tass.User_FK = ?";
+			} else {
+				query = "SELECT DISTINCT wob.*, adr.*, usr.* FROM workobject wob LEFT JOIN address adr ON wob.Address_FK = adr.AddressID"
+						+ " LEFT JOIN user usr ON wob.User_FK = usr.UserID";
+
+			}
+
 			statement = getConnection().prepareStatement(query);
+			if (userId != null) {
+				statement.setLong(1, userId);
+			}
+
 			queryResult = statement.executeQuery();
 
 			List<Object> workObjectList = new ArrayList<Object>();

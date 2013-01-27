@@ -10,8 +10,9 @@ public class FacilityManagerService {
 		// nothing to do
 	}
 
-	public Object[] getWorkObjectList() {
-		return DBHelper.getAllWorkObjects();
+	public Object[] getWorkObjectList(Object[] inputParams) {
+		Long userId = (Long) inputParams[0];
+		return DBHelper.getWorkObjectsForUser(userId);
 	}
 
 	public Object[] getTaskList() {
@@ -28,8 +29,7 @@ public class FacilityManagerService {
 	}
 
 	public Boolean authenticate(Object[] inputParams) {
-		return DBHelper.authenticate((Long) inputParams[0],
-				(String) inputParams[1], (String) inputParams[2]);
+		return DBHelper.authenticate((String) inputParams[0], (String) inputParams[1]);
 	}
 
 	public Boolean insertWorkItem(Object[] inputParams) {
