@@ -524,6 +524,10 @@ public class DBHelper {
 							continue;
 						}
 
+					} else if (FREQUENCY_ONCE.equals(frequency)) {
+
+						// no need to check the date as it is ONCE.
+
 					} else {
 						continue;
 					}
