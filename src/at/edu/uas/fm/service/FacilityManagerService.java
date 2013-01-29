@@ -30,7 +30,7 @@ public class FacilityManagerService {
 		return DBHelper.getAllWorkers();
 	}
 
-	public Boolean authenticate(Object[] inputParams) {
+	public Object[] authenticate(Object[] inputParams) {
 		return DBHelper.authenticate((String) inputParams[0],
 				(String) inputParams[1]);
 	}

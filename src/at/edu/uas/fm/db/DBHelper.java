@@ -30,10 +30,10 @@ public class DBHelper {
 	private static final String FREQUENCY_WEEKLY = "Weekly";
 	private static final String FREQUENCY_MONTHLY = "Monthly";
 
-	public static Boolean authenticate(String username, String password) {
+	public static Object[] authenticate(String username, String password) {
 		PreparedStatement statement = null;
 		ResultSet queryResult = null;
-		Boolean result = false;
+		Object[] result = new Object[0];
 
 		if (!StringUtils.isNullOrEmpty(username)
 				&& !StringUtils.isNullOrEmpty(password)) {
@@ -49,7 +49,21 @@ public class DBHelper {
 						&& (password.equals(queryResult
 								.getString("UserPassword")))) {
 					// at least one entry existed AND the password does match
-					result = true;
+
+					Object[] worker = new Object[10];
+
+					worker[0] = queryResult.getLong("UserId");
+					worker[1] = queryResult.getString("UserName");
+					worker[2] = queryResult.getString("FirstName");
+					worker[3] = queryResult.getString("LastName");
+					worker[4] = queryResult.getDate("DateOfBirth");
+					worker[5] = queryResult.getString("MobilePhoneNumber");
+					worker[6] = queryResult.getString("TelephoneNumber");
+					worker[7] = queryResult.getString("EMailAddress");
+					worker[8] = queryResult.getLong("Latitude");
+					worker[9] = queryResult.getLong("Longitude");
+
+					result = worker;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
